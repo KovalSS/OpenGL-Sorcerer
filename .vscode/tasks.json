@@ -1,0 +1,47 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "type": "cppbuild",
+            "label": "C/C++: Build Project",
+            "command": "C:\\msys64\\ucrt64\\bin\\g++.exe",
+            "args": [
+                "-fdiagnostics-color=always",
+                "-g",
+                "src/main.cpp",
+                "src/Shader.cpp",
+                "src/Mesh.cpp", 
+                "src/Skybox.cpp",
+                "src/Model.cpp",
+                "src/Camera.cpp",
+                "src/Callbacks.cpp",
+                "src/InputHandler.cpp",
+                "src/Globals.cpp",
+                "src/stb_image_impl.c",
+                "${workspaceFolder}/src/glad.c",
+                "-I${workspaceFolder}/include",
+                "-IC:\\msys64\\ucrt64\\include",
+                "-L${workspaceFolder}/lib",
+                "-LC:\\msys64\\ucrt64\\lib",
+                "-lglfw3",
+                "-lassimp",
+                "-lopengl32",
+                "-lgdi32",
+                "-std=c++17",
+                "-o",
+                "${workspaceFolder}/bin/main.exe"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "detail": "Build project with multiple files"
+        }
+    ]
+}

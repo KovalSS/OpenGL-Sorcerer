@@ -7,11 +7,31 @@ Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch) {
     Yaw = yaw;
     Pitch = pitch;
     Front = glm::vec3(0.0f, 0.0f, -1.0f);
-    MovementSpeed = 0.5f;
+    MovementSpeed = 1.0f;
     MouseSensitivity = 0.1f;
     Zoom = 45.0f;
     
     updateCameraVectors();
+}
+void Camera::setMovementSpeed(float speed) {
+    if (speed > 0.0f) {
+        MovementSpeed = speed;
+        std::cout << "Camera speed set to: " << MovementSpeed << std::endl;
+    }
+}
+
+void Camera::setMouseSensitivity(float sensitivity) {
+    if (sensitivity > 0.0f) {
+        MouseSensitivity = sensitivity;
+        std::cout << "Mouse sensitivity set to: " << MouseSensitivity << std::endl;
+    }
+}
+
+void Camera::setZoom(float zoom) {
+    if (zoom >= 1.0f && zoom <= 90.0f) {
+        Zoom = zoom;
+        std::cout << "Zoom set to: " << Zoom << " degrees" << std::endl;
+    }
 }
 
 glm::mat4 Camera::GetViewMatrix() {

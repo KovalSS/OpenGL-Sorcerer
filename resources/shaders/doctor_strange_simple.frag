@@ -6,36 +6,31 @@ in vec3 FragPos;
 in vec2 TexCoords;
 
 uniform sampler2D texture_diffuse1;
+uniform vec3 lightPos;
 uniform vec3 viewPos;
 uniform bool useTexture;
 uniform float time;
 
 void main()
 {
-    // Інтенсивне світіння
-    vec3 glowColor = vec3(0.4, 0.6, 1.0); // Сильний блакитний
-    
-    // Fresnel ефект
-    vec3 viewDir = normalize(viewPos - FragPos);
+    // Основний код з першого шейдера
     vec3 norm = normalize(Normal);
+    vec3 lightDir = normalize(lightPos - FragPos);
+    float diff = max(dot(norm, lightDir), 0.0);
+    vec3 diffuse = diff * vec3(1.0);
+    vec3 ambient = 0.3 * vec3(1.0);
+    
+    vec4 texColor = texture(texture_diffuse1, TexCoords);
+    if (useTexture && texColor.a < 0.1) discard;
+    
+    vec3 baseColor = (ambient + diffuse) * texColor.rgb;
+    
+    // ⭐ ДОДАЄМО ПРОСТЕ СВІТІННЯ
+    vec3 viewDir = normalize(viewPos - FragPos);
     float fresnel = pow(1.0 - max(dot(norm, viewDir), 0.0), 2.0);
+    float pulse = 0.3 + 0.2 * sin(time * 3.0);
+    vec3 glow = vec3(0.3, 0.5, 0.8) * fresnel * pulse;
     
-    // Пульсація
-    float pulse = 0.5 + 0.5 * sin(time * 4.0);
-    
-    vec4 resultColor;
-    if (useTexture) {
-        vec4 texColor = texture(texture_diffuse1, TexCoords);
-        if (texColor.a < 0.1) discard;
-        
-        // Сильне світіння поверх текстури
-        vec3 emissive = glowColor * fresnel * pulse * 0.8;
-        resultColor = vec4(texColor.rgb + emissive, texColor.a);
-    } else {
-        // Якщо нема текстури - чисте світіння
-        vec3 emissive = glowColor * fresnel * pulse;
-        resultColor = vec4(emissive, 1.0);
-    }
-    
-    FragColor = resultColor;
+    vec3 resultColor = baseColor + glow;
+    FragColor = vec4(resultColor, texColor.a);
 }

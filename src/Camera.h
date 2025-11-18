@@ -28,6 +28,14 @@ public:
     void ProcessMouseMovement(float xoffset, float yoffset, bool constrainPitch = true);
     void ProcessMouseScroll(float yoffset);
 
+    void setMovementSpeed(float speed);
+    void setMouseSensitivity(float sensitivity);
+    void setZoom(float zoom);
+    
+    float getMovementSpeed() const { return MovementSpeed; }
+    float getMouseSensitivity() const { return MouseSensitivity; }
+    float getZoom() const { return Zoom; }
+
 private:
     void updateCameraVectors();
 };

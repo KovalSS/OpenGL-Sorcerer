@@ -9,14 +9,13 @@ uniform sampler2D texture_diffuse1;
 uniform vec3 lightPos;
 uniform vec3 viewPos;
 uniform bool useTexture;
-uniform float time; // Додаємо час для анімації
+uniform float time;
 
 void main()
 {
-    // Магічні кольори
+    // Магічні кольори для світіння
     vec3 magicColor1 = vec3(0.8, 0.2, 0.8); // Фіолетовий
     vec3 magicColor2 = vec3(0.2, 0.6, 1.0); // Блакитний
-    vec3 magicColor3 = vec3(0.0, 1.0, 0.8); // Бірюзовий
     
     // Анімація кольорів
     float colorPulse = sin(time * 2.0) * 0.5 + 0.5;
@@ -27,29 +26,31 @@ void main()
     vec3 norm = normalize(Normal);
     float fresnel = pow(1.0 - max(dot(norm, viewDir), 0.0), 3.0);
     
-    // Пульсуюча інтенсивність
+    // Пульсуюча інтенсивність світіння
     float glowIntensity = 0.3 + 0.2 * sin(time * 3.0);
     
-    // Ефект рунічних символів
-    float runicPattern = sin(FragPos.x * 10.0 + time * 5.0) * 
-                        sin(FragPos.y * 8.0 + time * 3.0) * 
-                        sin(FragPos.z * 12.0 + time * 4.0);
-    runicPattern = max(0.0, runicPattern) * 0.3;
+    // ⭐ ОСНОВНЕ ОСВІТЛЕННЯ (як у першому шейдері)
+    vec3 lightDir = normalize(lightPos - FragPos);
+    float diff = max(dot(norm, lightDir), 0.0);
+    vec3 diffuse = diff * vec3(1.0);
+    vec3 ambient = 0.3 * vec3(1.0);
     
     vec4 resultColor;
     if (useTexture) {
         vec4 texColor = texture(texture_diffuse1, TexCoords);
         if (texColor.a < 0.1) discard;
         
-        // Додаємо світіння до текстури
-        vec3 emissive = glowColor * (fresnel * glowIntensity + runicPattern);
-        vec3 finalColor = texColor.rgb + emissive;
+        // ⭐ КОМБІНОВАНИЙ ЕФЕКТ: освітлення + світіння
+        vec3 baseColor = (ambient + diffuse) * texColor.rgb; // Освітлена текстура
+        vec3 emissive = glowColor * fresnel * glowIntensity; // Світіння
         
-        resultColor = vec4(finalColor, texColor.a);
+        resultColor = vec4(baseColor + emissive, texColor.a);
     } else {
-        // Без текстури - сильне світіння
-        vec3 emissive = glowColor * (fresnel * 0.8 + runicPattern);
-        resultColor = vec4(emissive, 1.0);
+        // Без текстури
+        vec3 baseColor = (ambient + diffuse) * vec3(1.0); // Білий з освітленням
+        vec3 emissive = glowColor * fresnel * glowIntensity; // Світіння
+        
+        resultColor = vec4(baseColor + emissive, 1.0);
     }
     
     FragColor = resultColor;
