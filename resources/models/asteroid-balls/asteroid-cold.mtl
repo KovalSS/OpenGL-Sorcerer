@@ -1,0 +1,14 @@
+# Blender 4.5.4 LTS MTL File: 'None'
+# www.blender.org
+
+newmtl Asteroid_1
+Ns 319.999939
+Ka 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd -o 0 -1 0 Asteroid_Color.png
+map_Ks -o 0 -1 0 Ateroid_Roughness.png
+map_refl -o 0 -1 0 Asteroid_Metallic.png
+map_Bump -o 0 -1 0 -bm 0.200000 Asteroid_Normal.png

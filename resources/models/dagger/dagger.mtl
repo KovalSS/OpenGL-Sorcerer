@@ -1,0 +1,50 @@
+# Blender 4.5.4 LTS MTL File: 'None'
+# www.blender.org
+
+newmtl blade
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd new dagger_blade_BaseColor.1001.png
+map_Ns new dagger_blade_Roughness.1001.png
+map_refl new dagger_blade_Metallic.1001.png
+map_Bump -bm 1.000000 new dagger_blade_Normal.1001.png
+
+newmtl grip
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd new dagger_grip_BaseColor.1001.png
+map_Ns new dagger_grip_Roughness.1001.png
+map_refl new dagger_grip_Metallic.1001.png
+map_Bump -bm 1.000000 new dagger_grip_Normal.1001.png
+
+newmtl guard
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd new dagger_guard_BaseColor.1001.png
+map_Ns new dagger_guard_Roughness.1001.png
+map_refl new dagger_guard_Metallic.1001.png
+map_Bump -bm 1.000000 new dagger_guard_Normal.1001.png
+
+newmtl round_sphere
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd new dagger_round sphere_BaseColor.1001.png
+map_Ns new dagger_round sphere_Roughness.1001.png
+map_refl new dagger_round sphere_Metallic.1001.png
+map_Bump -bm 1.000000 new dagger_round sphere_Normal.1001.png

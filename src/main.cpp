@@ -47,11 +47,11 @@ int main() {
     glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
 
     // Завантаження шейдерів
-    Shader ourShader("../resources/shaders/vertex.shader", "../resources/shaders/fragment.shader");
+    Shader ourShader("../resources/shaders/vertex.shader", "../resources/shaders/doctor_strange_simple.frag");
     
     // Завантаження моделі
     std::cout << "Loading model..." << std::endl;
-    Model ourModel("../resources/models/doctor-strenge/doctor-strenge.obj");
+    Model ourModel("../resources/models/asteroid-balls/asteroid-cold.obj");
     
     Shader skyboxShader("../resources/shaders/skybox.vert", "../resources/shaders/skybox.frag");
     
@@ -98,8 +98,8 @@ int main() {
 
         // Матриці перетворення
         glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.0f, -1.5f, 0.0f));
-        model = glm::scale(model, glm::vec3(5.0f, 5.0f, 5.0f));
+        model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
+        model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));
 
         ourShader.setMat4("projection", projection);
         ourShader.setMat4("view", view);
