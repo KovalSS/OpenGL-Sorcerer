@@ -49,9 +49,15 @@ int main() {
     // Завантаження шейдерів
     Shader ourShader("../resources/shaders/vertex.shader", "../resources/shaders/doctor_strange_simple.frag");
     
-    // Завантаження моделі
-    std::cout << "Loading model..." << std::endl;
-    Model ourModel("../resources/models/asteroid-balls/asteroid-cold.obj");
+    // Завантаження моделей
+    std::cout << "Loading models..." << std::endl;
+    Model ourModel("../resources/models/doctor-strenge/doctor-strenge.obj");
+    
+    // Завантаження моделей для орбіт - 8 однакових моделей dagger
+    std::vector<Model> orbitModels;
+    for (int i = 0; i < 8; i++) {
+        orbitModels.push_back(Model("../resources/models/dagger/dagger.obj"));
+    }
     
     Shader skyboxShader("../resources/shaders/skybox.vert", "../resources/shaders/skybox.frag");
     
@@ -66,6 +72,12 @@ int main() {
     };
     
     Skybox skybox(faces, SIZE_SKY);
+    
+    const float scale_dagger = 0.3f;
+    // Параметри орбіти
+    float orbitRadius = 1.8f;   // Радіус орбіти
+    float orbitSpeed = 0.5f;    // Швидкість обертання
+    float orbitHeight = 1.3f;   // Висота орбіти (вище центральної моделі)
     
     while (!glfwWindowShouldClose(window)) {
         // Таймінги
@@ -96,17 +108,59 @@ int main() {
         ourShader.setVec3("lightPos", glm::vec3(2.0f, 5.0f, 2.0f));
         ourShader.setVec3("viewPos", camera.Position);
 
-        // Матриці перетворення
+        // Центральна модель
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
-        model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));
+        model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
 
         ourShader.setMat4("projection", projection);
         ourShader.setMat4("view", view);
         ourShader.setMat4("model", model);
 
-        // Малювання моделі
+        // Малювання центральної моделі
         ourModel.Draw(ourShader);
+
+        // --- 8 МОДЕЛЕЙ НА ОРБІТІ ---
+        
+        // Основний кут обертання
+        float baseAngle = glfwGetTime() * orbitSpeed;
+        
+        // Розташовуємо 8 моделей рівномірно по колу
+        for (int i = 0; i < 8; i++) {
+            glm::mat4 orbitMatrix = glm::mat4(1.0f);
+            
+            // Кут для кожної моделі (45° між кожною)
+            float angle = baseAngle + glm::radians(i * 45.0f); // 360° / 8 = 45°
+            
+            // ГОРИЗОНТАЛЬНА ОРБІТА: X та Z координати, Y залишаємо постійним
+            float x = cos(angle) * orbitRadius;
+            float z = sin(angle) * orbitRadius;
+            orbitMatrix = glm::translate(orbitMatrix, glm::vec3(x, orbitHeight, z));
+            
+            // Центр орбіти - позиція центральної моделі
+            glm::vec3 orbitCenter = glm::vec3(0.0f, orbitHeight, 0.0f);
+            glm::vec3 orbitPos = glm::vec3(x, orbitHeight, z);
+            
+            // Напрямок до центру орбіти (не до центру сцени!)
+            glm::vec3 directionToCenter = glm::normalize(orbitCenter - orbitPos);
+            
+            // Для горизонтальної орбіти використовуємо вертикальний вектор "вгору"
+            glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
+            
+            // Створюємо матрицю орієнтації
+            glm::vec3 right = glm::normalize(glm::cross(up, directionToCenter));
+            glm::vec3 actualUp = glm::normalize(glm::cross(directionToCenter, right));
+            
+            orbitMatrix[0] = glm::vec4(right, 0.0f);
+            orbitMatrix[1] = glm::vec4(actualUp, 0.0f);
+            orbitMatrix[2] = glm::vec4(directionToCenter, 0.0f);
+            
+            
+            orbitMatrix = glm::scale(orbitMatrix, glm::vec3(scale_dagger, scale_dagger, scale_dagger));
+            
+            ourShader.setMat4("model", orbitMatrix);
+            orbitModels[i].Draw(ourShader);
+        }
 
         // Перевірка помилок OpenGL
         GLenum error = glGetError();

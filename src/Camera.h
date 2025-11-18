@@ -35,6 +35,7 @@ public:
     float getMovementSpeed() const { return MovementSpeed; }
     float getMouseSensitivity() const { return MouseSensitivity; }
     float getZoom() const { return Zoom; }
+    glm::mat4 GetViewMatrix() const;
 
 private:
     void updateCameraVectors();
