@@ -47,16 +47,23 @@ int main() {
     glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
 
     // Завантаження шейдерів
-    Shader ourShader("../resources/shaders/vertex.shader", "../resources/shaders/doctor_strange_simple.frag");
+    Shader ourShader("../resources/shaders/vertex.shader", "../resources/shaders/fragment.shader");
+    Shader brightShader("../resources/shaders/bright_vertex.shader", "../resources/shaders/bright_fragment.shader");
     
     // Завантаження моделей
     std::cout << "Loading models..." << std::endl;
     Model ourModel("../resources/models/doctor-strenge/doctor-strenge.obj");
     
-    // Завантаження моделей для орбіт - 8 однакових моделей dagger
-    std::vector<Model> orbitModels;
+    // Завантаження моделей для орбіт - 8 кинджалів
+    std::vector<Model> daggerModels;
     for (int i = 0; i < 8; i++) {
-        orbitModels.push_back(Model("../resources/models/dagger/dagger.obj"));
+        daggerModels.push_back(Model("../resources/models/dagger/dagger.obj"));
+    }
+    
+    // Завантаження моделей для вогняних куль - 8 куль
+    std::vector<Model> fireballModels;
+    for (int i = 0; i < 8; i++) {
+        fireballModels.push_back(Model("../resources/models/asteroid-balls/asteroid-hot.obj"));
     }
     
     Shader skyboxShader("../resources/shaders/skybox.vert", "../resources/shaders/skybox.frag");
@@ -74,10 +81,15 @@ int main() {
     Skybox skybox(faces, SIZE_SKY);
     
     const float scale_dagger = 0.3f;
-    // Параметри орбіти
-    float orbitRadius = 1.8f;   // Радіус орбіти
-    float orbitSpeed = 0.5f;    // Швидкість обертання
-    float orbitHeight = 1.3f;   // Висота орбіти (вище центральної моделі)
+    const float scale_fireball = 0.01f;
+    
+    // Параметри орбіт
+    float daggerOrbitRadius = 1.8f;   // Радіус орбіти кинджалів
+    float fireballOrbitRadius = 2.2f; // Радіус орбіти вогняних куль (більший)
+    float daggerOrbitSpeed = 0.5f;    // Швидкість обертання кинджалів
+    float fireballOrbitSpeed = -0.3f; // Швидкість обертання куль (протилежна!)
+    float daggerOrbitHeight = 1.3f;   // Висота орбіти кинджалів
+    float fireballOrbitHeight = 0.8f; // Висота орбіти вогняних куль
     
     while (!glfwWindowShouldClose(window)) {
         // Таймінги
@@ -89,22 +101,22 @@ int main() {
         processInput(window);
 
         // Очищення буферів
-        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Чорний фон для кращого контрасту
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // --- МАЛЮЄМО SKYBOX ПЕРШИМ ---
-        skyboxShader.use();
+        // --- МАТРИЦІ ---
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), 
                                             (float)SCR_WIDTH / (float)SCR_HEIGHT, 
                                             NEAR_PLANE, FAR_PLANE);
         glm::mat4 view = camera.GetViewMatrix();
+
+        // --- МАЛЮЄМО SKYBOX ---
+        skyboxShader.use();
         skybox.Draw(skyboxShader, view, projection);
 
         // --- МАЛЮЄМО DOCTOR STRANGE ---
         ourShader.use();
-        ourShader.setFloat("time", glfwGetTime());
-        
-        // Освітлення
+        ourShader.setFloat("time", currentFrame);
         ourShader.setVec3("lightPos", glm::vec3(2.0f, 5.0f, 2.0f));
         ourShader.setVec3("viewPos", camera.Position);
 
@@ -117,37 +129,25 @@ int main() {
         ourShader.setMat4("view", view);
         ourShader.setMat4("model", model);
 
-        // Малювання центральної моделі
         ourModel.Draw(ourShader);
 
-        // --- 8 МОДЕЛЕЙ НА ОРБІТІ ---
+        // --- 8 КИНДЖАЛІВ НА ОРБІТІ ---
+        float daggerBaseAngle = currentFrame * daggerOrbitSpeed;
         
-        // Основний кут обертання
-        float baseAngle = glfwGetTime() * orbitSpeed;
-        
-        // Розташовуємо 8 моделей рівномірно по колу
         for (int i = 0; i < 8; i++) {
             glm::mat4 orbitMatrix = glm::mat4(1.0f);
             
-            // Кут для кожної моделі (45° між кожною)
-            float angle = baseAngle + glm::radians(i * 45.0f); // 360° / 8 = 45°
+            float angle = daggerBaseAngle + glm::radians(i * 45.0f);
+            float x = cos(angle) * daggerOrbitRadius;
+            float z = sin(angle) * daggerOrbitRadius;
+            orbitMatrix = glm::translate(orbitMatrix, glm::vec3(x, daggerOrbitHeight, z));
             
-            // ГОРИЗОНТАЛЬНА ОРБІТА: X та Z координати, Y залишаємо постійним
-            float x = cos(angle) * orbitRadius;
-            float z = sin(angle) * orbitRadius;
-            orbitMatrix = glm::translate(orbitMatrix, glm::vec3(x, orbitHeight, z));
-            
-            // Центр орбіти - позиція центральної моделі
-            glm::vec3 orbitCenter = glm::vec3(0.0f, orbitHeight, 0.0f);
-            glm::vec3 orbitPos = glm::vec3(x, orbitHeight, z);
-            
-            // Напрямок до центру орбіти (не до центру сцени!)
+            // Орієнтація до центру
+            glm::vec3 orbitCenter = glm::vec3(0.0f, daggerOrbitHeight, 0.0f);
+            glm::vec3 orbitPos = glm::vec3(x, daggerOrbitHeight, z);
             glm::vec3 directionToCenter = glm::normalize(orbitCenter - orbitPos);
             
-            // Для горизонтальної орбіти використовуємо вертикальний вектор "вгору"
             glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
-            
-            // Створюємо матрицю орієнтації
             glm::vec3 right = glm::normalize(glm::cross(up, directionToCenter));
             glm::vec3 actualUp = glm::normalize(glm::cross(directionToCenter, right));
             
@@ -155,11 +155,52 @@ int main() {
             orbitMatrix[1] = glm::vec4(actualUp, 0.0f);
             orbitMatrix[2] = glm::vec4(directionToCenter, 0.0f);
             
-            
             orbitMatrix = glm::scale(orbitMatrix, glm::vec3(scale_dagger, scale_dagger, scale_dagger));
             
             ourShader.setMat4("model", orbitMatrix);
-            orbitModels[i].Draw(ourShader);
+            daggerModels[i].Draw(ourShader);
+        }
+
+        // --- 8 ВОГНЯНИХ КУЛЬ НА ОРБІТІ (ПРОТИЛЕЖНИЙ БІК) ---
+        brightShader.use();
+        brightShader.setFloat("time", currentFrame);
+        
+        float fireballBaseAngle = currentFrame * fireballOrbitSpeed; // Протилежна швидкість
+        
+        for (int i = 0; i < 8; i++) {
+            glm::mat4 fireballMatrix = glm::mat4(1.0f);
+            
+            // Кут зі зсувом на 22.5° для розташування між кинджалами
+            float angle = fireballBaseAngle + glm::radians(i * 45.0f + 22.5f);
+            float x = cos(angle) * fireballOrbitRadius;
+            float z = sin(angle) * fireballOrbitRadius;
+            fireballMatrix = glm::translate(fireballMatrix, glm::vec3(x, fireballOrbitHeight, z));
+            
+            // Орієнтація до центру
+            glm::vec3 orbitCenter = glm::vec3(0.0f, fireballOrbitHeight, 0.0f);
+            glm::vec3 orbitPos = glm::vec3(x, fireballOrbitHeight, z);
+            glm::vec3 directionToCenter = glm::normalize(orbitCenter - orbitPos);
+            
+            glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
+            glm::vec3 right = glm::normalize(glm::cross(up, directionToCenter));
+            glm::vec3 actualUp = glm::normalize(glm::cross(directionToCenter, right));
+            
+            fireballMatrix[0] = glm::vec4(right, 0.0f);
+            fireballMatrix[1] = glm::vec4(actualUp, 0.0f);
+            fireballMatrix[2] = glm::vec4(directionToCenter, 0.0f);
+            
+            // Додаємо обертання навколо власної осі
+            fireballMatrix = glm::rotate(fireballMatrix, currentFrame * 2.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+            
+            // Пульсація розміру
+            float pulse = sin(currentFrame * 3.0f) * 0.2f + 1.0f;
+            fireballMatrix = glm::scale(fireballMatrix, glm::vec3(scale_fireball * pulse));
+            
+            brightShader.setMat4("projection", projection);
+            brightShader.setMat4("view", view);
+            brightShader.setMat4("model", fireballMatrix);
+            
+            fireballModels[i].Draw(brightShader);
         }
 
         // Перевірка помилок OpenGL
