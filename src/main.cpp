@@ -12,7 +12,7 @@
 #include "InputHandler.h"
 #include "Globals.h"
 #include "Plane.h" 
-#include "OrbitSystem.h" // <-- ПІДКЛЮЧИЛИ НАШ НОВИЙ КЛАС
+#include "OrbitSystem.h" 
 
 const float SIZE_SKY = 1.0f;
 const float NEAR_PLANE = 0.1f;
@@ -64,10 +64,18 @@ int main() {
     Model sharedFireball("../resources/models/asteroid-balls/asteroid-hot.obj"); 
     
     // --- ЕЛЕМЕНТИ СЦЕНИ ---
+    // std::vector<std::string> faces = {
+    //     "../resources/textures/best_skybox/px.png", "../resources/textures/best_skybox/nx.png",
+    //     "../resources/textures/best_skybox/py.png", "../resources/textures/best_skybox/ny.png",
+    //     "../resources/textures/best_skybox/pz.png", "../resources/textures/best_skybox/nz.png" 
+    // };
     std::vector<std::string> faces = {
-        "../resources/textures/best_skybox/px.png", "../resources/textures/best_skybox/nx.png",
-        "../resources/textures/best_skybox/py.png", "../resources/textures/best_skybox/ny.png",
-        "../resources/textures/best_skybox/pz.png", "../resources/textures/best_skybox/nz.png" 
+        "../resources/textures/skybox_space/right.jpg",  // 1. Right  (+X)
+        "../resources/textures/skybox_space/left.jpg",   // 2. Left   (-X)
+        "../resources/textures/skybox_space/top.jpg",    // 3. Top    (+Y)
+        "../resources/textures/skybox_space/bottom.jpg", // 4. Bottom (-Y)
+        "../resources/textures/skybox_space/back.jpg",   // 5. Back   (+Z)
+        "../resources/textures/skybox_space/front.jpg"   // 6. Front  (-Z)
     };
     Skybox skybox(faces, SIZE_SKY);
 
@@ -75,7 +83,7 @@ int main() {
     groundPlane.setPosition(glm::vec3(0.0f, -0.1f, 0.0f));
     groundPlane.setScale(glm::vec3(100.0f, 1.0f, 100.0f));
 
-    // --- СИСТЕМА ОРБІТ (НОВА!) ---
+    // // --- СИСТЕМА ОРБІТ (НОВА!) ---
     OrbitSystem orbitSystem;
 
     // --- ГОЛОВНИЙ ЦИКЛ ---
@@ -86,7 +94,7 @@ int main() {
 
         processInput(window);
         
-        // 1. Обробка логіки орбіт (клавіші 1/2 +/-)
+        // // 1. Обробка логіки орбіт (клавіші 1/2 +/-)
         orbitSystem.ProcessInput(window, deltaTime);
 
         // Очищення
@@ -96,12 +104,12 @@ int main() {
         glm::mat4 projection = glm::perspective(glm::radians(localCamera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, NEAR_PLANE, FAR_PLANE);
         glm::mat4 view = localCamera.GetViewMatrix();
 
-        // 2. Отримуємо дані від системи орбіт
+        // // 2. Отримуємо дані від системи орбіт
         std::vector<glm::vec3> lightPositions = orbitSystem.GetFireballPositions(currentFrame);
         std::vector<glm::mat4> fireballMatrices = orbitSystem.GetFireballMatrices(currentFrame, lightPositions);
         std::vector<glm::mat4> daggerMatrices = orbitSystem.GetDaggerMatrices(currentFrame);
 
-        // 3. Оновлюємо світло в шейдерах
+        // // 3. Оновлюємо світло в шейдерах
         ourShader.use();
         ourShader.setVec3("viewPos", localCamera.Position);
         planeShader.use();
