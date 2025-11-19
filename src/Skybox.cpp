@@ -77,7 +77,7 @@ void Skybox::Draw(Shader& shader, glm::mat4 view, glm::mat4 projection) const{
     shader.use();
     view = glm::mat4(glm::mat3(view)); // Видаляємо позицію камери
 
-    view = glm::rotate(view, glm::radians(180.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    // view = glm::rotate(view, glm::radians(180.0f), glm::vec3(1.0f, 0.0f, 0.0f));
     
     shader.setMat4("view", view);
     shader.setMat4("projection", projection);
@@ -95,6 +95,8 @@ unsigned int Skybox::loadCubemap(const std::vector<std::string>& faces) {
     unsigned int textureID;
     glGenTextures(1, &textureID);
     glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+    // Вимикаємо перевертання для Cubemap, щоб текстури лягли правильно
+    stbi_set_flip_vertically_on_load(false); 
 
     int width, height, nrChannels;
     for (unsigned int i = 0; i < faces.size(); i++) {

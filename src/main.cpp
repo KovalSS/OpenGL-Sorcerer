@@ -74,8 +74,9 @@ int main() {
 std::vector<std::string> faces = {
     "../resources/textures/best_skybox/px.png", // Права (+X)
     "../resources/textures/best_skybox/nx.png", // Ліва (-X)
+    "../resources/textures/best_skybox/py.png", // Верх (+Y)    
     "../resources/textures/best_skybox/ny.png", // Низ (-Y)
-    "../resources/textures/best_skybox/py.png", // Верх (+Y)
+
     "../resources/textures/best_skybox/pz.png", // Задня (+Z)
     "../resources/textures/best_skybox/nz.png"  // Передня (-Z)
 };
