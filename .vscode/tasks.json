@@ -17,6 +17,7 @@
                 "src/Callbacks.cpp",
                 "src/InputHandler.cpp",
                 "src/Globals.cpp",
+                "src/Plane.cpp",
                 "src/stb_image_impl.c",
                 "${workspaceFolder}/src/glad.c",
                 "-I${workspaceFolder}/include",

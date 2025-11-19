@@ -76,6 +76,9 @@ void Skybox::Draw(Shader& shader, glm::mat4 view, glm::mat4 projection) {
     
     shader.use();
     view = glm::mat4(glm::mat3(view)); // Видаляємо позицію камери
+
+    view = glm::rotate(view, glm::radians(180.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    
     shader.setMat4("view", view);
     shader.setMat4("projection", projection);
     

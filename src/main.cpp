@@ -10,7 +10,7 @@
 #include "Callbacks.h"
 #include "InputHandler.h"
 #include "Globals.h"
-
+#include "PLane.h"
 // Константи
 const float SIZE_SKY = 1.0f;
 const float NEAR_PLANE = 0.1f;
@@ -68,16 +68,22 @@ int main() {
     
     Shader skyboxShader("../resources/shaders/skybox.vert", "../resources/shaders/skybox.frag");
     
-    // Завантажуємо cubemap текстури
-    std::vector<std::string> faces = {
-        "../resources/textures/skybox/nx.png",
-        "../resources/textures/skybox/nz.png",
-        "../resources/textures/skybox/py.png", 
-        "../resources/textures/skybox/ny.png",
-        "../resources/textures/skybox/px.png",
-        "../resources/textures/skybox/nx.png"
-    };
-    
+    // Завантажуємо cubemap текстури - ВИПРАВЛЕНИЙ ПОРЯДОК
+std::vector<std::string> faces = {
+    "../resources/textures/best_skybox/px.png", // Права (+X)
+    "../resources/textures/best_skybox/nx.png", // Ліва (-X)
+    "../resources/textures/best_skybox/ny.png", // Низ (-Y)
+    "../resources/textures/best_skybox/py.png", // Верх (+Y)
+    "../resources/textures/best_skybox/pz.png", // Задня (+Z)
+    "../resources/textures/best_skybox/nz.png"  // Передня (-Z)
+};
+    Plane groundPlane("../resources/textures/plane/mondo-grass-300-mm-architextures.jpg", 100.0f);
+    groundPlane.setPosition(glm::vec3(0.0f, -0.1f, 0.0f));
+    groundPlane.setScale(glm::vec3(100.0f, 1.0f, 100.0f));
+
+    Shader planeShader("../resources/shaders/plane_vertex.shader", "../resources/shaders/plane_fragment.shader");
+
+
     Skybox skybox(faces, SIZE_SKY);
     
     const float scale_dagger = 0.3f;
@@ -109,6 +115,12 @@ int main() {
                                             (float)SCR_WIDTH / (float)SCR_HEIGHT, 
                                             NEAR_PLANE, FAR_PLANE);
         glm::mat4 view = camera.GetViewMatrix();
+
+
+        planeShader.use();
+        planeShader.setMat4("view", view);
+        planeShader.setMat4("projection", projection);
+        groundPlane.Draw(planeShader);
 
         // --- МАЛЮЄМО SKYBOX ---
         skyboxShader.use();
