@@ -12,7 +12,7 @@ public:
     Plane(const std::string& texturePath, float textureRepeat = 1.0f);
     ~Plane();
     
-    void Draw(Shader& shader);
+    void Draw(Shader& shader) const;
     bool loadTexture(const std::string& path);
     void setPosition(const glm::vec3& position) { this->position = position; }
     void setScale(const glm::vec3& scale) { this->scale = scale; }

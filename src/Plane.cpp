@@ -90,7 +90,7 @@ bool Plane::loadTexture(const std::string& path) {
     }
 }
 
-void Plane::Draw(Shader& shader) {
+void Plane::Draw(Shader& shader) const{
     if (textureID == 0) {
         std::cout << "Warning: Plane texture not loaded!" << std::endl;
         return;

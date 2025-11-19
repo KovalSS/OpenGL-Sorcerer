@@ -8,7 +8,7 @@
 class Skybox {
 public:
     Skybox(const std::vector<std::string>& faces, float SIZE);
-    void Draw(Shader& shader, glm::mat4 view, glm::mat4 projection);
+    void Draw(Shader& shader, glm::mat4 view, glm::mat4 projection) const;
     unsigned int getCubemapTexture() const { return cubemapTexture; }
     
 private:

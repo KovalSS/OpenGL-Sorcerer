@@ -34,9 +34,6 @@ void Camera::setZoom(float zoom) {
     }
 }
 
-glm::mat4 Camera::GetViewMatrix() {
-    return glm::lookAt(Position, Position + Front, Up);
-}
 
 void Camera::ProcessKeyboard(int direction, float deltaTime) {
     float velocity = MovementSpeed * deltaTime;

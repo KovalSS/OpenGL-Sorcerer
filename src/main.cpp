@@ -11,6 +11,8 @@
 #include "InputHandler.h"
 #include "Globals.h"
 #include "PLane.h"
+#include "Callbacks.h"
+
 // Константи
 const float SIZE_SKY = 1.0f;
 const float NEAR_PLANE = 0.1f;
@@ -30,11 +32,22 @@ int main() {
         glfwTerminate();
         return -1;
     }
+    Camera localCamera(glm::vec3(0.0f, 1.0f, 5.0f)); 
+    // <--- ВИПРАВЛЕНО: Створюємо контекст вікна та заповнюємо його
+    WindowContext context;
+    context.camera = &localCamera;
+    context.lastX = SCR_WIDTH / 2.0f;
+    context.lastY = SCR_HEIGHT / 2.0f;
+    context.firstMouse = true;
+    
+    // <--- ВИПРАВЛЕНО: Передаємо контекст у GLFW user pointer
+    glfwSetWindowUserPointer(window, &context); 
+    
     glfwMakeContextCurrent(window);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     // Завантаження GLAD
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
@@ -54,21 +67,10 @@ int main() {
     std::cout << "Loading models..." << std::endl;
     Model ourModel("../resources/models/doctor-strenge/doctor-strenge.obj");
     
-    // Завантаження моделей для орбіт - 8 кинджалів
-    std::vector<Model> daggerModels;
-    for (int i = 0; i < 8; i++) {
-        daggerModels.push_back(Model("../resources/models/dagger/dagger.obj"));
-    }
-    
-    // Завантаження моделей для вогняних куль - 8 куль
-    std::vector<Model> fireballModels;
-    for (int i = 0; i < 8; i++) {
-        fireballModels.push_back(Model("../resources/models/asteroid-balls/asteroid-hot.obj"));
-    }
-    
+    Model sharedDagger("../resources/models/dagger/dagger.obj");           
+    Model sharedFireball("../resources/models/asteroid-balls/asteroid-hot.obj"); 
     Shader skyboxShader("../resources/shaders/skybox.vert", "../resources/shaders/skybox.frag");
     
-    // Завантажуємо cubemap текстури - ВИПРАВЛЕНИЙ ПОРЯДОК
 std::vector<std::string> faces = {
     "../resources/textures/best_skybox/px.png", // Права (+X)
     "../resources/textures/best_skybox/nx.png", // Ліва (-X)
@@ -111,10 +113,8 @@ std::vector<std::string> faces = {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // --- МАТРИЦІ ---
-        glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), 
-                                            (float)SCR_WIDTH / (float)SCR_HEIGHT, 
-                                            NEAR_PLANE, FAR_PLANE);
-        glm::mat4 view = camera.GetViewMatrix();
+        glm::mat4 projection = glm::perspective(glm::radians(localCamera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, NEAR_PLANE, FAR_PLANE);
+        glm::mat4 view = localCamera.GetViewMatrix();
 
 
         planeShader.use();
@@ -130,7 +130,7 @@ std::vector<std::string> faces = {
         ourShader.use();
         ourShader.setFloat("time", currentFrame);
         ourShader.setVec3("lightPos", glm::vec3(2.0f, 5.0f, 2.0f));
-        ourShader.setVec3("viewPos", camera.Position);
+        ourShader.setVec3("viewPos", localCamera.Position);
 
         // Центральна модель
         glm::mat4 model = glm::mat4(1.0f);
@@ -145,7 +145,8 @@ std::vector<std::string> faces = {
 
         // --- 8 КИНДЖАЛІВ НА ОРБІТІ ---
         float daggerBaseAngle = currentFrame * daggerOrbitSpeed;
-        
+        ourShader.use(); 
+
         for (int i = 0; i < 8; i++) {
             glm::mat4 orbitMatrix = glm::mat4(1.0f);
             
@@ -153,8 +154,7 @@ std::vector<std::string> faces = {
             float x = cos(angle) * daggerOrbitRadius;
             float z = sin(angle) * daggerOrbitRadius;
             orbitMatrix = glm::translate(orbitMatrix, glm::vec3(x, daggerOrbitHeight, z));
-            
-            // Орієнтація до центру
+
             glm::vec3 orbitCenter = glm::vec3(0.0f, daggerOrbitHeight, 0.0f);
             glm::vec3 orbitPos = glm::vec3(x, daggerOrbitHeight, z);
             glm::vec3 directionToCenter = glm::normalize(orbitCenter - orbitPos);
@@ -169,26 +169,26 @@ std::vector<std::string> faces = {
             
             orbitMatrix = glm::scale(orbitMatrix, glm::vec3(scale_dagger, scale_dagger, scale_dagger));
             
-            ourShader.setMat4("model", orbitMatrix);
-            daggerModels[i].Draw(ourShader);
+            ourShader.setMat4("model", orbitMatrix); 
+            sharedDagger.Draw(ourShader);           
         }
 
-        // --- 8 ВОГНЯНИХ КУЛЬ НА ОРБІТІ (ПРОТИЛЕЖНИЙ БІК) ---
+        // --- 8 ВОГНЯНИХ КУЛЬ ---
         brightShader.use();
         brightShader.setFloat("time", currentFrame);
+        brightShader.setMat4("projection", projection); 
+        brightShader.setMat4("view", view);             
         
-        float fireballBaseAngle = currentFrame * fireballOrbitSpeed; // Протилежна швидкість
+        float fireballBaseAngle = currentFrame * fireballOrbitSpeed;
         
         for (int i = 0; i < 8; i++) {
             glm::mat4 fireballMatrix = glm::mat4(1.0f);
-            
-            // Кут зі зсувом на 22.5° для розташування між кинджалами
             float angle = fireballBaseAngle + glm::radians(i * 45.0f + 22.5f);
             float x = cos(angle) * fireballOrbitRadius;
             float z = sin(angle) * fireballOrbitRadius;
             fireballMatrix = glm::translate(fireballMatrix, glm::vec3(x, fireballOrbitHeight, z));
-            
-            // Орієнтація до центру
+
+             // Орієнтація
             glm::vec3 orbitCenter = glm::vec3(0.0f, fireballOrbitHeight, 0.0f);
             glm::vec3 orbitPos = glm::vec3(x, fireballOrbitHeight, z);
             glm::vec3 directionToCenter = glm::normalize(orbitCenter - orbitPos);
@@ -200,19 +200,13 @@ std::vector<std::string> faces = {
             fireballMatrix[0] = glm::vec4(right, 0.0f);
             fireballMatrix[1] = glm::vec4(actualUp, 0.0f);
             fireballMatrix[2] = glm::vec4(directionToCenter, 0.0f);
-            
-            // Додаємо обертання навколо власної осі
+
             fireballMatrix = glm::rotate(fireballMatrix, currentFrame * 2.0f, glm::vec3(0.0f, 1.0f, 0.0f));
-            
-            // Пульсація розміру
             float pulse = sin(currentFrame * 3.0f) * 0.2f + 1.0f;
             fireballMatrix = glm::scale(fireballMatrix, glm::vec3(scale_fireball * pulse));
             
-            brightShader.setMat4("projection", projection);
-            brightShader.setMat4("view", view);
             brightShader.setMat4("model", fireballMatrix);
-            
-            fireballModels[i].Draw(brightShader);
+            sharedFireball.Draw(brightShader);            
         }
 
         // Перевірка помилок OpenGL

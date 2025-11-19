@@ -23,7 +23,6 @@ public:
            glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), 
            float yaw = -90.0f, float pitch = 0.0f);
     
-    glm::mat4 GetViewMatrix();
     void ProcessKeyboard(int direction, float deltaTime);
     void ProcessMouseMovement(float xoffset, float yoffset, bool constrainPitch = true);
     void ProcessMouseScroll(float yoffset);

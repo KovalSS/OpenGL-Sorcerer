@@ -1,5 +1,4 @@
 #include "Callbacks.h"
-#include "Globals.h"
 #include <iostream>
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
@@ -7,20 +6,26 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 }
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
-    if (firstMouse) {
-        lastX = xpos;
-        lastY = ypos;
-        firstMouse = false;
+    WindowContext* context = static_cast<WindowContext*>(glfwGetWindowUserPointer(window));
+    if (!context || !context->camera) return; 
+
+    if (context->firstMouse) {
+        context->lastX = (float)xpos;
+        context->lastY = (float)ypos;
+        context->firstMouse = false;
     }
 
-    float xoffset = xpos - lastX;
-    float yoffset = lastY - ypos;
-    lastX = xpos;
-    lastY = ypos;
+    float xoffset = (float)xpos - context->lastX;
+    float yoffset = context->lastY - (float)ypos; 
+    context->lastX = (float)xpos;
+    context->lastY = (float)ypos;
 
-    camera.ProcessMouseMovement(xoffset, yoffset);
+    context->camera->ProcessMouseMovement(xoffset, yoffset);
 }
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
-    camera.ProcessMouseScroll(yoffset);
+    WindowContext* context = static_cast<WindowContext*>(glfwGetWindowUserPointer(window));
+    if (!context || !context->camera) return; 
+    
+    context->camera->ProcessMouseScroll((float)yoffset);
 }
