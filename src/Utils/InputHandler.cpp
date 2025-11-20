@@ -34,32 +34,32 @@ void processInput(GLFWwindow* window) {
                        glfwGetKey(window, GLFW_KEY_RIGHT_CONTROL) == GLFW_PRESS;
 
     if (ctrlPressed) {
-        if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS && !keysProcessed[2]) {
+        if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS && !keysProcessed[0]) {
             camera.setMouseSensitivity(0.01f);  
             // std::cout << "Mouse sensitivity: 0.4" << std::endl;
             keysProcessed[0] = true;
         }
-        if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS && !keysProcessed[0]) {
+        if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS && !keysProcessed[1]) {
             camera.setMouseSensitivity(0.05f);  
             // std::cout << "Mouse sensitivity: 0.05" << std::endl;
             keysProcessed[1] = true;
         }
-        if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS && !keysProcessed[1]) {
+        if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS && !keysProcessed[2]) {
             camera.setMouseSensitivity(0.1f);   
             // std::cout << "Mouse sensitivity: 0.1" << std::endl;
             keysProcessed[2] = true;
         }
-        if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS && !keysProcessed[2]) {
+        if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS && !keysProcessed[3]) {
             camera.setMouseSensitivity(0.2f);  
             // std::cout << "Mouse sensitivity: 0.2" << std::endl;
             keysProcessed[3] = true;
         }
-        if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS && !keysProcessed[2]) {
+        if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS && !keysProcessed[4]) {
             camera.setMouseSensitivity(0.3f);  
             // std::cout << "Mouse sensitivity: 0.3" << std::endl;
             keysProcessed[4] = true;
         }
-        if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS && !keysProcessed[2]) {
+        if (glfwGetKey(window, GLFW_KEY_6) == GLFW_PRESS && !keysProcessed[5]) {
             camera.setMouseSensitivity(0.4f);  
             // std::cout << "Mouse sensitivity: 0.4" << std::endl;
             keysProcessed[5] = true;
