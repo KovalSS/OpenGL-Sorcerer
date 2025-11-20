@@ -4,16 +4,16 @@
 #include <vector>
 #include <string>
 
-#include "Shader.h"
-#include "Model.h"
-#include "Camera.h"
-#include "Skybox.h"
-#include "Callbacks.h"
-#include "InputHandler.h"
-#include "Globals.h"
-#include "Plane.h" 
-#include "OrbitSystem.h" 
-#include "LightingSystem.h" 
+#include "../Core/Shader.h"
+#include "../Core/Model.h"
+#include "../Core/Camera.h"
+#include "../Core/Skybox.h"
+#include "../Utils/Callbacks.h"
+#include "../Utils/InputHandler.h"
+#include "../Utils/Globals.h"
+#include "../Core/Plane.h" 
+#include "../Logic/OrbitSystem.h" 
+#include "../Logic/LightingSystem.h" 
 
 const float SIZE_SKY = 1.0f;
 const float NEAR_PLANE = 0.1f;
@@ -87,11 +87,7 @@ int main() {
     groundPlane.setScale(glm::vec3(100.0f, 1.0f, 100.0f));
 
     // --- 3. СИСТЕМИ ---
-    OrbitSystem orbitSystem; // Тепер містить і логіку центральної сфери
-
-
-    
-
+    OrbitSystem orbitSystem; 
 
     // --- 4. ГОЛОВНИЙ ЦИКЛ ---
     while (!glfwWindowShouldClose(window)) {

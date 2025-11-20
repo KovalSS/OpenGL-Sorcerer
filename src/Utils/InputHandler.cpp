@@ -1,6 +1,6 @@
 #include "InputHandler.h"
 #include "Globals.h"
-#include "Callbacks.h" // <--- ВИПРАВЛЕНО: Потрібен для WindowContext
+#include "Callbacks.h" 
 #include <iostream>
 #include <glm/glm.hpp>
 

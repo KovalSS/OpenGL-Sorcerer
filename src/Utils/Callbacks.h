@@ -2,7 +2,7 @@
 #define CALLBACKS_H
 
 #include <GLFW/glfw3.h>
-#include "Camera.h" 
+#include "../Core/Camera.h" 
 
 struct WindowContext {
     Camera* camera;

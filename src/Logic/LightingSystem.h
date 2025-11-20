@@ -1,7 +1,7 @@
 #ifndef LIGHTING_SYSTEM_H
 #define LIGHTING_SYSTEM_H
 
-#include "Shader.h"
+#include "../Core/Shader.h"
 #include "OrbitSystem.h"
 #include <string>
 
