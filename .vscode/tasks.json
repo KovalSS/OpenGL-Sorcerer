@@ -8,21 +8,42 @@
             "args": [
                 "-fdiagnostics-color=always",
                 "-g",
+                
+                // --- 1. ГОЛОВНИЙ ФАЙЛ ---
                 "src/main.cpp",
-                "src/Shader.cpp",
-                "src/Mesh.cpp", 
-                "src/Skybox.cpp",
-                "src/Model.cpp",
-                "src/Camera.cpp",
-                "src/Callbacks.cpp",
-                "src/InputHandler.cpp",
-                "src/Globals.cpp",
-                "src/Plane.cpp",
-                "src/OrbitSystem.cpp",
-                "src/stb_image_impl.c",
-                "${workspaceFolder}/src/glad.c",
+                
+                // --- 2. CORE FILES ---
+                "src/Core/Shader.cpp",
+                "src/Core/Mesh.cpp", 
+                "src/Core/Skybox.cpp",
+                "src/Core/Model.cpp",
+                "src/Core/Camera.cpp",
+                "src/Core/Plane.cpp",
+                
+                // --- 3. LOGIC FILES ---
+                "src/Logic/OrbitSystem.cpp",
+                "src/Logic/LightingSystem.cpp",
+
+                // --- 4. UTILS FILES ---
+                "src/Utils/Callbacks.cpp",
+                "src/Utils/InputHandler.cpp",
+                "src/Utils/Globals.cpp",
+                
+                // --- 5. VENDOR FILES ---
+                "src/Vendor/stb_image_impl.c",
+                "${workspaceFolder}/src/Vendor/glad.c", // Використовуємо Vendor
+                
+                // --- 6. INCLUDE PATHS (-I) ---
+                // Папки, де компілятор шукатиме .h файли (наприклад, для #include "Camera.h")
                 "-I${workspaceFolder}/include",
+                "-I${workspaceFolder}/src/Core",
+                "-I${workspaceFolder}/src/Logic",
+                "-I${workspaceFolder}/src/Utils",
+                "-I${workspaceFolder}/src/Vendor",
+
                 "-IC:\\msys64\\ucrt64\\include",
+                
+                // --- 7. LINKER FLAGS (-L, -l) ---
                 "-L${workspaceFolder}/lib",
                 "-LC:\\msys64\\ucrt64\\lib",
                 "-lglfw3",
@@ -30,6 +51,8 @@
                 "-lopengl32",
                 "-lgdi32",
                 "-std=c++17",
+                
+                // --- 8. OUTPUT ---
                 "-o",
                 "${workspaceFolder}/bin/main.exe"
             ],
