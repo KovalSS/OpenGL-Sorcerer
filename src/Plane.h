@@ -27,7 +27,7 @@ private:
     
     void setupPlane();
     void cleanup();
-    void updateTextureCoords();  // ← Додайте цей метод у private секцію
+    void updateTextureCoords(); 
 };
 
 #endif

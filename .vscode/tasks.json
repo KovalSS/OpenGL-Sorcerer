@@ -19,6 +19,7 @@
                 "src/Globals.cpp",
                 "src/Plane.cpp",
                 "src/OrbitSystem.cpp",
+                "src/LightingSystem.cpp",
                 "src/stb_image_impl.c",
                 "${workspaceFolder}/src/glad.c",
                 "-I${workspaceFolder}/include",

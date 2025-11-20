@@ -138,4 +138,3 @@ void Plane::updateTextureCoords() {
     glBindBuffer(GL_ARRAY_BUFFER, planeVBO);
     glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
 }
-// ← ТУТ ФАЙЛ ЗАКІНЧУЄТЬСЯ БЕЗ ЗАЙВИХ ДУЖОК
