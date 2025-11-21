@@ -12,10 +12,7 @@ uniform mat4 projection;
 
 void main()
 {
-    // Розраховуємо позицію фрагмента у світі
     FragPos = vec3(model * vec4(aPos, 1.0));
-    
-    // Оскільки це плоска підлога, нормаль завжди дивиться вгору (вісь Y)
     Normal = vec3(0.0, 1.0, 0.0); 
     
     TexCoords = aTexCoord;
